@@ -65,4 +65,13 @@ public class GameEntityFactory implements EntityFactory {
                 .with(new OffscreenCleanComponent())
                 .build();
     }
+
+    @Spawns("wall")
+    public Entity newWall(SpawnData data){
+        return FXGL.entityBuilder(data)
+                .type(EntityType.WALL)
+                .viewWithBBox("wall.png")
+                .with(new CollidableComponent(true))
+                .build();
+    }
 }

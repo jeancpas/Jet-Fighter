@@ -6,16 +6,11 @@ import com.almasb.fxgl.app.scene.FXGLMenu;
 import com.almasb.fxgl.app.scene.SceneFactory;
 import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.core.math.FXGLMath;
+import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.core.math.Vec2;
-import com.almasb.fxgl.entity.SpawnData;
-import com.almasb.fxgl.input.Input;
-import com.almasb.fxgl.input.UserAction;
-import com.almasb.fxgl.physics.CollisionHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -26,7 +21,6 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.*;
 public class JetFighterApp extends GameApplication {
     private Entity player;
     private final int TILESIZE = 60;
-
     @Override
     protected void initSettings(GameSettings gameSettings) {
         //Insert game settings on init
@@ -48,22 +42,14 @@ public class JetFighterApp extends GameApplication {
     protected void initGame() {
         getGameWorld().addEntityFactory(new GameEntityFactory());
         getSettings().setGlobalSoundVolume(0.1);
-//        Get all variables
-        PropertyMap state = FXGL.getWorldProperties();
+
 
         spawn("background");
         //add offset playersize
-        player = spawn("player",getAppWidth() /2 , getAppHeight() / 2);
-//        Spawn powerups randomly
-        run( () -> {
-            if(state.getInt("powerup?") == 0) {
-                spawn("powerUp",
-//                        random place
-                        FXGLMath.random(TILESIZE, getAppWidth() - TILESIZE), FXGLMath.random(TILESIZE, getAppHeight() - TILESIZE));
-                state.setValue("powerup?", 1);
-            }
-            return null;
-        }, Duration.seconds(2));
+        player = spawn("player", getAppWidth() /2 , getAppHeight() /2 );
+
+        spawn("wall", player.getX() + 60, player.getY());
+
 
         //Spawning the player in the game in initGame
         /*
@@ -73,6 +59,37 @@ public class JetFighterApp extends GameApplication {
                 .view(new Rectangle(25, 25, Color.GREEN))
                 .buildAndAttach();
          */
+    }
+
+    @Override
+    protected void onUpdate(double tpf) {
+        //        Get all variables
+        PropertyMap state = FXGL.getWorldProperties();
+        //        Spawn powerups randomly
+        run( () -> {
+            if(state.getInt("powerUpSpawned?") == 0 &&
+                !player.getComponent(PlayerComponent.class).isPowederedUp()) {
+                  Entity powerUp = spawn("powerUp",
+//                        random place
+                        FXGLMath.random(TILESIZE, getAppWidth() - TILESIZE) + player.getX() + 50, FXGLMath.random(TILESIZE, getAppHeight() - TILESIZE));
+                state.setValue("powerUpSpawned?", 1);
+//                Timer to remove powerup after 3 seconds B
+//                Bugged
+//                runOnce(() -> {
+//                    powerUp.removeFromWorld();
+//                    state.setValue("powerUpSpawned?", 0);
+//                    return null;
+//                }, Duration.seconds(3));
+            }
+            return null;
+        }, Duration.seconds(2));
+//        Timer on powerup
+        if(player.getComponent(PlayerComponent.class).isPowederedUp())
+        run(() -> {
+            player.getComponent(PlayerComponent.class).setPowederedUp(false);
+            return null;
+        }, Duration.seconds(5));
+
     }
 
     @Override
@@ -99,19 +116,26 @@ public class JetFighterApp extends GameApplication {
 
     @Override
     protected void initUI() {
-        Text timerText = new Text("Timer: ");
+        Text timerText = new Text("Timer");
         timerText.setTranslateX(0); // x = 50
         timerText.setTranslateY(50); // y = 100
+        timerText.setFill(Color.WHITE);
         timerText.textProperty().bind(getip("timer").asString());
-
         FXGL.getGameScene().addUINode(timerText); // add to the scene graph
+        Text livesText = new Text("");
+        livesText.setTranslateX(0); // x = 50
+        livesText.setTranslateY(60); // y = 100
+        livesText.setFill(Color.RED);
+        livesText.textProperty().bind(getip("lives").asString());
+        FXGL.getGameScene().addUINode(livesText); // add to the scene graph
 
     }
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
         vars.put("timer", 999);
-        vars.put("powerup?", 0);
+        vars.put("lives", 4);
+        vars.put("powerUpSpawned?", 0);
         vars.put("score", 0);
     }
 
@@ -122,8 +146,15 @@ public class JetFighterApp extends GameApplication {
         onCollisionBegin(EntityType.PLAYER, EntityType.POWERUP, (player1, powerup) ->{
             powerup.removeFromWorld();
             play("machinegun.wav");
-            player.getComponent(PlayerComponent.class).setPowerUp(true);
-            state.setValue("powerup?", 0);
+            player.getComponent(PlayerComponent.class).setPowederedUp(true);
+            state.setValue("powerUpSpawned?", 0);
+            return null;
+        });
+
+        onCollisionBegin(EntityType.PLAYER, EntityType.WALL, (player1, wall) ->{
+            play("oof.wav");
+            player.setPosition(getAppWidth() /2 , getAppHeight() /2 );
+            state.increment("lives", -1);
             return null;
         });
     }
