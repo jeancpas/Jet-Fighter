@@ -105,6 +105,7 @@ public class JetFighterApp extends GameApplication {
         timerText.textProperty().bind(getip("timer").asString());
 
         FXGL.getGameScene().addUINode(timerText); // add to the scene graph
+
     }
 
     @Override
@@ -121,6 +122,7 @@ public class JetFighterApp extends GameApplication {
         onCollisionBegin(EntityType.PLAYER, EntityType.POWERUP, (player1, powerup) ->{
             powerup.removeFromWorld();
             play("machinegun.wav");
+            player.getComponent(PlayerComponent.class).setPowerUp(true);
             state.setValue("powerup?", 0);
             return null;
         });
