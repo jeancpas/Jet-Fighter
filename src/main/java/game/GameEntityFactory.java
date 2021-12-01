@@ -17,12 +17,6 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.getAppWidth;
 
 public class GameEntityFactory implements EntityFactory {
 
-    @Spawns("enemy")
-    public Entity newEnemy(SpawnData data){
-        return FXGL.entityBuilder(data)
-                .view(new Rectangle(40, 40, Color.RED))
-                .build();
-    }
 
     @Spawns("background")
     public Entity newBackground(SpawnData data){
@@ -33,6 +27,15 @@ public class GameEntityFactory implements EntityFactory {
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data){
+        return FXGL.entityBuilder(data)
+                .type(EntityType.PLAYER)
+                .with(new PlayerComponent())
+                .viewWithBBox("player.png")
+                .with(new CollidableComponent(true))
+                .buildAndAttach();
+    }
+    @Spawns("enemy")
+    public Entity newEnemy(SpawnData data){
         return FXGL.entityBuilder(data)
                 .type(EntityType.PLAYER)
                 .with(new PlayerComponent())

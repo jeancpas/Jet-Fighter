@@ -1,7 +1,10 @@
 package game;
 
 
+import com.almasb.fxgl.animation.AnimationBuilder;
 import com.almasb.fxgl.core.math.Vec2;
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 
@@ -30,7 +33,12 @@ public class PlayerComponent extends Component{
     }
 
     public void shoot() {
+//        Zelfde angle als bij move, deze wordt in een 2D point omgezet en dan meegeven aan de spawnData
         Vec2 dir = Vec2.fromAngle(entity.getRotation() - 90);
-        spawn("bullet", new SpawnData(entity.getX(), entity.getY()).put("dir", dir.toPoint2D()));
+        Entity bullet = spawn("bullet", new SpawnData(entity.getX(), entity.getY()).put("dir", dir.toPoint2D()));
+    }
+
+    public void shootBeam(){
+
     }
 }
