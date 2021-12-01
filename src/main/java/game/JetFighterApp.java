@@ -89,31 +89,11 @@ public class JetFighterApp extends GameApplication {
         FXGL.onKeyDown(KeyCode.SPACE, () ->{
             player.getComponent(PlayerComponent.class).shoot();
         });
-        /*
-            public void move() {
-        Vec2 dir = Vec2.fromAngle(entity.getRotation() - 90)
-                .mulLocal(4);
-        entity.translate(dir);
-    }
-
-    STOLEN FROM https://github.com/AlmasB/FXGLGames/blob/master/Asteroids/src/main/java/com/almasb/fxglgames/PlayerComponent.java#L16
-         */
-
         //Test
         FXGL.onKey(KeyCode.H, () ->{
 //            System.out.println(player.angleProperty());
             showMessage("Hello");
         });
-        /*
-        LONG WAY
-        input.addAction(new UserAction("Move Right") {
-            @Override
-            protected void onAction() {
-                player.translateX(5);
-            }
-        }, KeyCode.D);
-
-         */
     }
 
     @Override
