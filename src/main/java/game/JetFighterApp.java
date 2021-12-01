@@ -47,6 +47,7 @@ public class JetFighterApp extends GameApplication {
     @Override
     protected void initGame() {
         getGameWorld().addEntityFactory(new GameEntityFactory());
+        getSettings().setGlobalSoundVolume(0.1);
 //        Get all variables
         PropertyMap state = FXGL.getWorldProperties();
 
@@ -110,6 +111,7 @@ public class JetFighterApp extends GameApplication {
     protected void initGameVars(Map<String, Object> vars) {
         vars.put("timer", 999);
         vars.put("powerup?", 0);
+        vars.put("score", 0);
     }
 
     @Override
@@ -118,6 +120,7 @@ public class JetFighterApp extends GameApplication {
 
         onCollisionBegin(EntityType.PLAYER, EntityType.POWERUP, (player1, powerup) ->{
             powerup.removeFromWorld();
+            play("machinegun.wav");
             state.setValue("powerup?", 0);
             return null;
         });
