@@ -1,14 +1,17 @@
 package game;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.dsl.components.KeepOnScreenComponent;
 import com.almasb.fxgl.dsl.components.OffscreenCleanComponent;
 import com.almasb.fxgl.dsl.components.ProjectileComponent;
+import com.almasb.fxgl.dsl.components.RandomMoveComponent;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -32,16 +35,15 @@ public class GameEntityFactory implements EntityFactory {
                 .with(new PlayerComponent())
                 .viewWithBBox("player.png")
                 .with(new CollidableComponent(true))
-                .buildAndAttach();
+                .with(new KeepOnScreenComponent())
+                .build();
     }
     @Spawns("enemy")
     public Entity newEnemy(SpawnData data){
         return FXGL.entityBuilder(data)
-                .type(EntityType.PLAYER)
-                .with(new PlayerComponent())
                 .viewWithBBox("player.png")
-                .with(new CollidableComponent(true)) 
-                .buildAndAttach();
+                .with(new CollidableComponent(true))
+                .build();
     }
 
     @Spawns("powerUp")

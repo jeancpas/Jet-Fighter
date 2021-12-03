@@ -40,7 +40,7 @@ public class PlayerComponent extends Component{
             spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
         }
         else{
-            System.out.println("PowerUp!");
+//            System.out.println("PowerUp!");
             spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
             getGameTimer().runOnceAfter( () ->{
                 spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));

@@ -29,7 +29,6 @@ public class JetFighterApp extends GameApplication {
         gameSettings.setHeight(600);
         gameSettings.setTitle("Jet Fighter App");
         gameSettings.setVersion("0.1");
-//        TODO set true
         gameSettings.setMainMenuEnabled(true);
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override
@@ -44,22 +43,12 @@ public class JetFighterApp extends GameApplication {
         getGameWorld().addEntityFactory(new GameEntityFactory());
         getSettings().setGlobalSoundVolume(0.1);
 
-
         spawn("background");
         //add offset playersize
         player = spawn("player", getAppWidth() /2 , getAppHeight() /2 );
 
         spawn("wall", player.getX() + 100, player.getY());
 
-
-        //Spawning the player in the game in initGame
-        /*
-        Manier om Entities te spawnen zonder een builder te gebruiken
-        player = FXGL.entityBuilder()
-                .at(300, 300)
-                .view(new Rectangle(25, 25, Color.GREEN))
-                .buildAndAttach();
-         */
     }
 
     @Override
@@ -78,17 +67,8 @@ public class JetFighterApp extends GameApplication {
             }
             return null;
         }, Duration.seconds(2));
-//        Timer on powerup
-//        In playerComponent
-//        if(player.getComponent(PlayerComponent.class).isPowederedUp())
-//        run(() -> {
-//            player.getComponent(PlayerComponent.class).setPowederedUp(false);
-//            return null;
-//        }, Duration.seconds(5));
-
-        run (() ->{
+        getGameTimer().runAtInterval (() ->{
             state.increment("timer", -1);
-            return null;
         },Duration.seconds(1));
 
 
@@ -112,7 +92,6 @@ public class JetFighterApp extends GameApplication {
         });
         //Test
         FXGL.onKey(KeyCode.H, () ->{
-//            System.out.println(player.angleProperty());
             showMessage("Hello");
         });
     }
