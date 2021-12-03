@@ -12,11 +12,17 @@ import org.jetbrains.annotations.NotNull;
 public class JetFighterMainMenu extends FXGLMenu {
     public JetFighterMainMenu() {
         super(MenuType.MAIN_MENU);
-        var button = new JetFighterButton("Start new game", this::fireNewGame);
-        button.setTranslateX(FXGL.getAppWidth() / 2 - 200 / 2);
-        button.setTranslateY(FXGL.getAppHeight() / 2 - 40 / 2);
+        var btnStart = new JetFighterButton("Start new game", this::fireNewGame);
+        var btnExit = new JetFighterButton("Exit", this::fireExit);
 
-        getContentRoot().getChildren().add(button);
+        btnStart.setTranslateX(FXGL.getAppWidth() / 2 - 200 / 2);
+        btnStart.setTranslateY(FXGL.getAppHeight() / 2 - 40 / 2);
+
+        btnExit.setTranslateX(FXGL.getAppWidth() / 2 - 200 / 2);
+        btnExit.setTranslateY(FXGL.getAppHeight() / 2 - 40 / 2 + 40);
+
+        getContentRoot().getChildren().add(btnStart);
+        getContentRoot().getChildren().add(btnExit);
     }
 
     private static class JetFighterButton extends StackPane {

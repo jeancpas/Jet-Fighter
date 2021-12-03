@@ -10,7 +10,7 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.*;
 
 
 public class PlayerComponent extends Component{
-    private boolean IsPowederedUp = false;
+    private boolean isPoweredUp = false;
 
 
 
@@ -29,24 +29,35 @@ public class PlayerComponent extends Component{
 
     public void move(){
         Vec2 dir = Vec2.fromAngle(entity.getRotation() - 90)
-                .mulLocal(6);
+                .mulLocal(4);
         entity.translate(dir);
     }
-
+//    https://github.com/AlmasB/FXGLGames/blob/5f99eee3c03deac2501cb813cabbdc2c9f692ebc/Asteroids/src/main/java/com/almasb/fxglgames/PlayerComponent.java
     public void shoot() {
-//        Zelfde angle als bij move, deze wordt in een 2D point omgezet en dan meegeven aan de spawnData
+        //        Zelfde angle als bij move, deze wordt in een 2D point omgezet en dan meegeven aan de spawnData
         Vec2 dir = Vec2.fromAngle(entity.getRotation() - 90);
-        spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
-        if(IsPowederedUp) {
-            showMessage("Pew pew!");
+        if(!isPoweredUp()) {
+            spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
+        }
+        else{
+            System.out.println("PowerUp!");
+            spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
+            getGameTimer().runOnceAfter( () ->{
+                spawn("bullet", new SpawnData(entity.getCenter()).put("dir", dir.toPoint2D()));
+            }, Duration.seconds(0.5));
+
         }
     }
 
-    public boolean isPowederedUp(){
-        return IsPowederedUp;
+    public void startPowerUpTimer(){
+        this.isPoweredUp = true;
+        getGameTimer().runOnceAfter(() ->{
+            this.isPoweredUp = false;
+        }, Duration.seconds(5));
     }
 
-    public  void setPowederedUp(boolean b){
-        IsPowederedUp = b;
+    public boolean isPoweredUp(){
+        return isPoweredUp;
     }
+
 }

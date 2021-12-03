@@ -59,7 +59,7 @@ public class GameEntityFactory implements EntityFactory {
 
         return FXGL.entityBuilder(data)
                 .type(EntityType.BULLET)
-                .view(new Rectangle(60  , 20, Color.BLUE))
+                .viewWithBBox(new Rectangle(60  , 20, Color.BLUE))
                 .with(new ProjectileComponent(dir, 600 ))
                 .with(new CollidableComponent(true))
                 .with(new OffscreenCleanComponent())

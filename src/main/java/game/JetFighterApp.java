@@ -6,7 +6,6 @@ import com.almasb.fxgl.app.scene.FXGLMenu;
 import com.almasb.fxgl.app.scene.SceneFactory;
 import com.almasb.fxgl.core.collection.PropertyMap;
 import com.almasb.fxgl.core.math.FXGLMath;
-import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import javafx.scene.input.KeyCode;
@@ -21,6 +20,8 @@ import static com.almasb.fxgl.dsl.FXGLForKtKt.*;
 public class JetFighterApp extends GameApplication {
     private Entity player;
     private final int TILESIZE = 60;
+    private final int startY = 50;
+    private final int offset = 20;
     @Override
     protected void initSettings(GameSettings gameSettings) {
         //Insert game settings on init
@@ -29,7 +30,7 @@ public class JetFighterApp extends GameApplication {
         gameSettings.setTitle("Jet Fighter App");
         gameSettings.setVersion("0.1");
 //        TODO set true
-        gameSettings.setMainMenuEnabled(false);
+        gameSettings.setMainMenuEnabled(true);
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override
             public FXGLMenu newMainMenu(){
@@ -48,7 +49,7 @@ public class JetFighterApp extends GameApplication {
         //add offset playersize
         player = spawn("player", getAppWidth() /2 , getAppHeight() /2 );
 
-        spawn("wall", player.getX() + 60, player.getY());
+        spawn("wall", player.getX() + 100, player.getY());
 
 
         //Spawning the player in the game in initGame
@@ -66,29 +67,31 @@ public class JetFighterApp extends GameApplication {
         //        Get all variables
         PropertyMap state = FXGL.getWorldProperties();
         //        Spawn powerups randomly
-        run( () -> {
+        run(() -> {
+//            Check if powerup is al gespawned en player is niet poweredup
             if(state.getInt("powerUpSpawned?") == 0 &&
-                !player.getComponent(PlayerComponent.class).isPowederedUp()) {
+                !player.getComponent(PlayerComponent.class).isPoweredUp()) {
                   Entity powerUp = spawn("powerUp",
-//                        random place
-                        FXGLMath.random(TILESIZE, getAppWidth() - TILESIZE) + player.getX() + 50, FXGLMath.random(TILESIZE, getAppHeight() - TILESIZE));
+//                        random place ver van de speler
+                        FXGLMath.random(TILESIZE, getAppWidth() - TILESIZE), FXGLMath.random(TILESIZE, getAppHeight() - TILESIZE));
                 state.setValue("powerUpSpawned?", 1);
-//                Timer to remove powerup after 3 seconds B
-//                Bugged
-//                runOnce(() -> {
-//                    powerUp.removeFromWorld();
-//                    state.setValue("powerUpSpawned?", 0);
-//                    return null;
-//                }, Duration.seconds(3));
             }
             return null;
         }, Duration.seconds(2));
 //        Timer on powerup
-        if(player.getComponent(PlayerComponent.class).isPowederedUp())
-        run(() -> {
-            player.getComponent(PlayerComponent.class).setPowederedUp(false);
+//        In playerComponent
+//        if(player.getComponent(PlayerComponent.class).isPowederedUp())
+//        run(() -> {
+//            player.getComponent(PlayerComponent.class).setPowederedUp(false);
+//            return null;
+//        }, Duration.seconds(5));
+
+        run (() ->{
+            state.increment("timer", -1);
             return null;
-        }, Duration.seconds(5));
+        },Duration.seconds(1));
+
+
 
     }
 
@@ -116,18 +119,27 @@ public class JetFighterApp extends GameApplication {
 
     @Override
     protected void initUI() {
-        Text timerText = new Text("Timer");
+        Text timerText = getUIFactoryService().newText("Timer");
         timerText.setTranslateX(0); // x = 50
-        timerText.setTranslateY(50); // y = 100
-        timerText.setFill(Color.WHITE);
-        timerText.textProperty().bind(getip("timer").asString());
-        FXGL.getGameScene().addUINode(timerText); // add to the scene graph
-        Text livesText = new Text("");
+        timerText.setTranslateY(startY); // y = 100
+        timerText.textProperty().bind(getip("timer").asString("Time left: %d "));
+
+
+        Text livesText = getUIFactoryService().newText("");
         livesText.setTranslateX(0); // x = 50
-        livesText.setTranslateY(60); // y = 100
+        livesText.setTranslateY(startY + offset); // y = 100
         livesText.setFill(Color.RED);
-        livesText.textProperty().bind(getip("lives").asString());
+        livesText.textProperty().bind(getip("lives").asString("Lives: %d"));
+
+
+        Text scoreText = getUIFactoryService().newText("");
+        scoreText.setTranslateX(0); // x = 50
+        scoreText.setTranslateY(startY + offset*2); // y = 100
+        scoreText.textProperty().bind(getip("score").asString("Score: %d"));
+
+        FXGL.getGameScene().addUINode(timerText); // add to the scene graph
         FXGL.getGameScene().addUINode(livesText); // add to the scene graph
+        FXGL.getGameScene().addUINode(scoreText); // add to the scene graph
 
     }
 
@@ -146,7 +158,7 @@ public class JetFighterApp extends GameApplication {
         onCollisionBegin(EntityType.PLAYER, EntityType.POWERUP, (player1, powerup) ->{
             powerup.removeFromWorld();
             play("machinegun.wav");
-            player.getComponent(PlayerComponent.class).setPowederedUp(true);
+            player.getComponent(PlayerComponent.class).startPowerUpTimer();
             state.setValue("powerUpSpawned?", 0);
             return null;
         });
@@ -155,6 +167,13 @@ public class JetFighterApp extends GameApplication {
             play("oof.wav");
             player.setPosition(getAppWidth() /2 , getAppHeight() /2 );
             state.increment("lives", -1);
+            return null;
+        });
+
+        onCollision(EntityType.BULLET, EntityType.WALL, (bullet, wall) ->{
+            wall.removeFromWorld();
+            bullet.removeFromWorld();
+            state.increment("score", 100);
             return null;
         });
     }
