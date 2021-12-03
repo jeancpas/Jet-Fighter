@@ -34,7 +34,7 @@ public class JetFighterApp extends GameApplication {
         gameSettings.setSceneFactory(new SceneFactory() {
             @Override
             public FXGLMenu newMainMenu(){
-                return new JetFighterMainMenu();
+                return new  JetFighterMainMenu();
             }
         });
     }

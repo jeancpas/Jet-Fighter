@@ -40,7 +40,7 @@ public class GameEntityFactory implements EntityFactory {
                 .type(EntityType.PLAYER)
                 .with(new PlayerComponent())
                 .viewWithBBox("player.png")
-                .with(new CollidableComponent(true))
+                .with(new CollidableComponent(true)) 
                 .buildAndAttach();
     }
 
